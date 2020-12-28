@@ -11,11 +11,29 @@ namespace CLI
     {
         static void Main( )
         {
+            var user = "";
+            var entity = "";
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
             while (true)
             {
+                Console.Write($"${user}{entity}>");
+                Console.ForegroundColor = ConsoleColor.White;
                 var line = Console.ReadLine();
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
                 if (string.IsNullOrWhiteSpace(line))
                     break;
+                if (line.StartsWith('\\'))
+                {
+                    switch (line)
+                    {
+                        case "\\q":
+                            return;
+                        case "\\cls":
+                            Console.Clear();
+                            break;
+                    }
+                    continue;
+                }
                 var statements = line.ToLower().Split(' ');
                 switch (statements[0])
                 {
@@ -35,9 +53,6 @@ namespace CLI
                     case "delete":
                         HandleDelete(statements.Skip(1).ToArray());
                         break;
-                    case "\\q":
-                    case "quit":
-                        return;
                     default:
                         Console.WriteLine($"Token desconhecido '{statements[0]}'");
                         break;
