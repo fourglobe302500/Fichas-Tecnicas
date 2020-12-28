@@ -9,19 +9,20 @@ namespace CLI
 {
     class Program
     {
+        private static string _user = null;
+        private static string _entity = null;
+
         static void Main( )
         {
-            var user = "";
-            var entity = "";
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
             while (true)
             {
-                Console.Write($"${user}{entity}>");
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.Write($"${(_user ?? "")}{(_entity ?? "")}> ");
                 Console.ForegroundColor = ConsoleColor.White;
                 var line = Console.ReadLine();
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.ForegroundColor = ConsoleColor.DarkBlue;
                 if (string.IsNullOrWhiteSpace(line))
-                    break;
+                    continue;
                 if (line.StartsWith('\\'))
                 {
                     switch (line)
@@ -53,6 +54,23 @@ namespace CLI
                     case "delete":
                         HandleDelete(statements.Skip(1).ToArray());
                         break;
+                    case "use":
+                        if (ValidateArguments(statements, 1))
+                        {
+                            _entity = null;
+                        }
+                        else if (!ValidateArguments(statements, 2))
+                        {
+                            Console.WriteLine("Argumentos invalidos para use de tabela");
+                        }
+                        else
+                        {
+                            if ((new string[] { "ingredient", "ingrediente" }).Contains(statements[1]))
+                                _entity = statements[1];
+                            else
+                                Console.WriteLine("Tabela desconhecida");
+                        }
+                        break;
                     default:
                         Console.WriteLine($"Token desconhecido '{statements[0]}'");
                         break;
@@ -62,16 +80,13 @@ namespace CLI
 
         private static void HandleSelect(string[] args)
         {
-            if (validateArguments(args, 0))
-            {
-                Console.WriteLine("Faltando entidade para ser selecionada");
+            if (!Valid(args))
                 return;
-            }
-            switch (args[0])
+            switch (_entity ?? args[0])
             {
                 case "ingrediente":
                 case "ingredient":
-                    if (!validateArguments(args, 1))
+                    if (!ValidateArguments(args, _entity != null ? 0 : 1))
                         Console.WriteLine($"Numero de argumentos invalido");
                     else
                         Ingrediente.Select();
@@ -84,19 +99,16 @@ namespace CLI
 
         private static void HandleCreate(string[] args)
         {
-            if (validateArguments(args, 0))
-            {
-                Console.WriteLine("Faltando entidade para ser criada");
+            if (!Valid(args))
                 return;
-            }
-            switch (args[0])
+            switch (_entity ?? args[0])
             {
                 case "ingrediente":
                 case "ingredient":
-                    if (!validateArguments(args, 4))
+                    if (!ValidateArguments(args, _entity != null ? 3 : 4))
                         Console.WriteLine($"Numero de argumentos invalido");
                     else
-                        if (!Ingrediente.Create(args.Skip(1).ToArray()).Save())
+                        if (!Ingrediente.Create(args.Skip(_entity != null ? 0 : 1).ToArray()).Save())
                         Console.WriteLine("Incapaz de criar o ingrediente por razões internals");
                     break;
                 default:
@@ -107,19 +119,16 @@ namespace CLI
 
         private static void HandleUpdate(string[] args)
         {
-            if (validateArguments(args, 0))
-            {
-                Console.WriteLine("Faltando entidade para ser atualizada");
+            if (!Valid(args))
                 return;
-            }
-            switch (args[0])
+            switch (_entity ?? args[0])
             {
                 case "ingrediente":
                 case "ingredient":
-                    if (!validateArguments(args, 4))
+                    if (!ValidateArguments(args, _entity != null ? 3 : 4))
                         Console.WriteLine($"Numero de argumentos invalido");
                     else
-                        if (!Ingrediente.Create(args.Skip(1).ToArray()).Update())
+                        if (!Ingrediente.Create(args.Skip(_entity != null ? 0 : 1).ToArray()).Update())
                         Console.WriteLine("Incapaz de atualizar o ingrediente por razões internals");
                     break;
                 default:
@@ -130,19 +139,16 @@ namespace CLI
 
         private static void HandleDelete(string[] args)
         {
-            if (validateArguments(args, 0))
-            {
-                Console.WriteLine("Faltando entidade para ser delateda");
+            if (!Valid(args))
                 return;
-            }
-            switch (args[0])
+            switch (_entity ?? args[0])
             {
                 case "ingrediente":
                 case "ingredient":
-                    if (!validateArguments(args, 2))
+                    if (!ValidateArguments(args, _entity != null ? 1 : 2))
                         Console.WriteLine($"Numero de argumentos invalido");
                     else
-                        if (!Ingrediente.Delete(args[1]))
+                        if (!Ingrediente.Delete(args[_entity != null ? 0 : 1]))
                         Console.WriteLine("Incapaz de deletar o ingrediente por razões internals");
                     break;
                 default:
@@ -151,6 +157,20 @@ namespace CLI
             }
         }
 
-        private static bool validateArguments(string[] args, int index) => args.Length == index || string.IsNullOrWhiteSpace(args[index]);
+        private static bool ValidateArguments(string[] args, int index) => args.Length == index || string.IsNullOrWhiteSpace(args[index]);
+
+        private static bool Valid(string[] args)
+        {
+            if (_entity != null)
+            {
+                return true;
+            }
+            if (ValidateArguments(args, 0))
+            {
+                Console.WriteLine("Faltando entidade para ser criada");
+                return false;
+            }
+            return true;
+        }
     }
 }

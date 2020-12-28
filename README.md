@@ -9,7 +9,7 @@
   * [x] Request
   * [x] Update
   * [x] Delete
-* [ ] Use Table (simplify syntax)
+* [x] Use Table (simplify syntax)
 * [ ] "Fichas" db
 * [ ] "Fichas" db CRUD
   * [ ] Create
