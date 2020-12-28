@@ -1,13 +1,27 @@
-# Ficha Tecnicas Parra a Juju
+# Ficha Tecnicas Para a Tomateira
 
 ## Must Make
 
-* [ ] Create CLI
+* [x] Create CLI
+* [x] Ingredient db
+* [x] Ingredient db CRUD
+  * [x] Create
+  * [x] Request
+  * [x] Update
+  * [x] Delete
+* [x] Use Table (simplify syntax)
+* [ ] "Fichas" db
+* [ ] "Fichas" db CRUD
+  * [ ] Create
+  * [ ] Request
+  * [ ] Update
+  * [ ] Delete
 * [ ] User Entry
-* [ ] Create Text File DB
 
 ----------
 
-### Update
+### Update After Production Deploy
 
+* [ ] Clean Code
 * [ ] Create Print Function
+* [ ] Auto-Complete
