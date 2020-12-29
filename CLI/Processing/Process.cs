@@ -4,7 +4,7 @@ using System.Linq;
 
 using CLI.Entities;
 
-namespace CLI
+namespace CLI.Processing
 {
     internal class Process
     {
@@ -62,9 +62,7 @@ namespace CLI
                 case "use":
                     // TODO: extrair para metodo
                     if (ValidateArguments(statements, 1))
-                    {
                         _entity = null;
-                    }
                     else if (!ValidateArguments(statements, 2))
                     {
                         errors.Add("Argumentos invalidos para use de tabela");

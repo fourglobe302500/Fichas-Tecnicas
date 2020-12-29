@@ -22,9 +22,9 @@ namespace CLI.Entities
         public float Rendimento { get; }
         public float Price { get; }
 
-        internal static void Select( )
-            => LoadData().ForEach((ingredient)
-                => Console.WriteLine($"id: {ingredient.id}, Ingrediente: {ingredient.name}, Rendimento: {ingredient.rendimento}, Preço/Kg: {ingredient.price}"));
+        internal static void Select( ) => LoadData()
+            .SelectMany(ingredient => new string[] { ingredient.id.ToString(), ingredient.name, ingredient.rendimento.ToString(), ingredient.price.ToString() })
+            .PrettyPrint(new string[] { "id", "Ingrediente", "Rendimento", "Preço" });
 
         internal static void Delete(string name, ref List<string> errors)
         {

@@ -11,7 +11,7 @@
   - [x] Delete
 - [x] Use Table (simplify syntax)
 - [x] Dev Friendly
-- [ ] Pretty Print
+- [x] Pretty Print
 - [ ] "Fichas" db
 - [ ] "Fichas" db CRUD
   - [ ] Create
