@@ -2,26 +2,28 @@
 
 ## Must Make
 
-* [x] Create CLI
-* [x] Ingredient db
-* [x] Ingredient db CRUD
-  * [x] Create
-  * [x] Request
-  * [x] Update
-  * [x] Delete
-* [x] Use Table (simplify syntax)
-* [ ] "Fichas" db
-* [ ] "Fichas" db CRUD
-  * [ ] Create
-  * [ ] Request
-  * [ ] Update
-  * [ ] Delete
-* [ ] User Entry
+- [x] Create CLI
+- [x] Ingredient db
+- [x] Ingredient db CRUD
+  - [x] Create
+  - [x] Request
+  - [x] Update
+  - [x] Delete
+- [x] Use Table (simplify syntax)
+- [x] Dev Friendly
+- [ ] Pretty Print
+- [ ] "Fichas" db
+- [ ] "Fichas" db CRUD
+  - [ ] Create
+  - [ ] Request
+  - [ ] Update
+  - [ ] Delete
+- [ ] User Entry
 
-----------
+---
 
 ### Update After Production Deploy
 
-* [ ] Clean Code
-* [ ] Create Print Function
-* [ ] Auto-Complete
+- [ ] Clean Code
+- [ ] Create Print Function
+- [ ] Auto-Complete

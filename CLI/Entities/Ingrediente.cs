@@ -11,91 +11,84 @@ namespace CLI.Entities
     {
         private const string _filePath = "C:\\Data\\Fichas_Tecnicas\\Ingredientes.csv";
 
-        private Ingrediente(string name, float rendimento, float preçoPorKilo, bool error)
+        private Ingrediente(string name, float rendimento, float preçoPorKilo)
         {
             Name = name;
             Rendimento = rendimento;
             Price = preçoPorKilo;
-            Error = error;
         }
 
         public string Name { get; }
         public float Rendimento { get; }
         public float Price { get; }
-        public bool Error { get; }
 
         internal static void Select( )
             => LoadData().ForEach((ingredient)
                 => Console.WriteLine($"id: {ingredient.id}, Ingrediente: {ingredient.name}, Rendimento: {ingredient.rendimento}, Preço/Kg: {ingredient.price}"));
 
-        internal bool Save( )
+        internal static void Delete(string name, ref List<string> errors)
         {
-            if (Error)
-                return false;
-
             var processedData = LoadData();
-
-            if (processedData.Any((Ingrediente) => Ingrediente.name == Name))
-            {
-                Console.WriteLine($"Ingrediente {Name} já existe");
-                return false;
-            }
-            var id = processedData.OrderByDescending(ingrediente => ingrediente.id).FirstOrDefault().id;
-            Write(processedData.Append(new IngredientStruct(id + 1, Name, Rendimento, Price)).Select(ingredient => ingredient.ToString()).ToArray());
-            Console.WriteLine($"id: {id + 1}, Ingrediente: {Name}, Rendimento: {Rendimento}, Preço/Kg: {Price}");
-            return true;
+            if (processedData.Any((Ingrediente) => Ingrediente.name == name))
+                Write(processedData.Where(ingredient => ingredient.name != name).Select(ingrediente => ingrediente.ToString()).ToArray());
+            else
+                errors.AddRange(new string[] { $"Ingrediente {name} não existe", "Incapaz de deletar o ingrediente por razões privates" });
         }
 
-        internal bool Update( )
+        internal static void Update(string[] args, ref List<string> errors)
         {
-            if (Error)
-                return false;
+            var upIngredient = Construct(args, ref errors);
+            if (errors.Any())
+                return;
 
             var processedData = LoadData();
 
-            if (!processedData.Any((Ingrediente) => Ingrediente.name == Name))
+            if (!processedData.Any((ingrediente) => ingrediente.name == upIngredient.Name))
             {
-                Console.WriteLine($"Ingrediente {Name} não existe");
-                return false;
+                errors.Add($"Ingrediente {upIngredient.Name} não existe");
+                return;
             }
             Write(processedData.Select(
-                    ingredient => ingredient.name != Name
+                    ingredient => ingredient.name != upIngredient.Name
                     ? ingredient.ToString()
-                    : new IngredientStruct(ingredient.id, Name, Rendimento, Price).ToString())
+                    : new IngredientStruct(ingredient.id, upIngredient.Name, upIngredient.Rendimento, upIngredient.Price).ToString())
                 .ToArray());
-            var id = processedData.Where(Ingrediente => Ingrediente.name == Name).Single().id;
-            Console.WriteLine($"id: {id}, Ingrediente: {Name}, Rendimento: {Rendimento}, Preço/Kg: {Price}");
-
-            return true;
+            var id = processedData.Where(Ingrediente => Ingrediente.name == upIngredient.Name).Single().id;
+            Console.WriteLine($"id: {id}, Ingrediente: {upIngredient.Name}, Rendimento: {upIngredient.Rendimento}, Preço/Kg: {upIngredient.Price}");
         }
 
-        internal static bool Delete(string name)
+        internal static void Create(string[] args, ref List<string> errors)
         {
+            var newIngredient = Construct(args, ref errors);
+            if (errors.Any())
+                return;
+
             var processedData = LoadData();
-            if (!processedData.Any((Ingrediente) => Ingrediente.name == name))
+
+            if (processedData.Any((Ingrediente) => Ingrediente.name == newIngredient.Name))
             {
-                Console.WriteLine($"Ingrediente {name} não existe");
-                return false;
+                errors.Add($"Ingrediente {newIngredient.Name} já existe");
+                return;
             }
-            Write(processedData.Where(ingredient => ingredient.name != name).Select(ingrediente => ingrediente.ToString()).ToArray());
-            return true;
+            var id = processedData.OrderByDescending(ingrediente => ingrediente.id).FirstOrDefault().id;
+            Write(processedData.Append(new IngredientStruct(id + 1, newIngredient.Name, newIngredient.Rendimento, newIngredient.Price))
+                .Select(ingredient => ingredient.ToString())
+                .ToArray());
+            Console.WriteLine($"id: {id + 1}, Ingrediente: {newIngredient.Name}, Rendimento: {newIngredient.Rendimento}, Preço/Kg: {newIngredient.Price}");
         }
 
-        public static Ingrediente Create(string[] args)
+        private static Ingrediente Construct(string[] args, ref List<string> errors)
         {
             var name = args[0];
-            var error = false;
             if (!float.TryParse(args[1].Replace('.', ','), out var rendimento))
             {
-                Console.WriteLine($"Rendimento em fomato invalido {args[1]}");
-                error = true;
+                errors.Add($"Rendimento em fomato invalido {args[1]}");
             }
             if (!float.TryParse(args[2].Replace('.', ','), out var price))
             {
-                Console.WriteLine($"Preço em fomato invalido {args[2]}");
-                error = true;
+                errors.Add($"Preço em fomato invalido {args[2]}");
             }
-            return new Ingrediente(name, rendimento, price, error);
+            return new Ingrediente(name, rendimento, price);
         }
 
         private static void Write(string[] vals) => File.WriteAllLines(_filePath, vals);
