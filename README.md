@@ -12,12 +12,14 @@
 - [x] Use Table (simplify syntax)
 - [x] Dev Friendly
 - [x] Pretty Print
-- [ ] "Fichas" db
-- [ ] "Fichas" db CRUD
+- [x] Inner acess for ingredient CRUD
+- [x] Better CRUD
+- [ ] Recipes db CRUD
   - [ ] Create
   - [ ] Request
   - [ ] Update
   - [ ] Delete
+- [ ] Recipes
 - [ ] User Entry
 
 ---
