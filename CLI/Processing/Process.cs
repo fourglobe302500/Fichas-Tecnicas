@@ -60,21 +60,7 @@ namespace CLI.Processing
                 case "delete":
                     return HandleDelete(statements.Skip(1).ToArray());
                 case "use":
-                    // TODO: extrair para metodo
-                    if (ValidateArguments(statements, 1))
-                        _entity = null;
-                    else if (!ValidateArguments(statements, 2))
-                    {
-                        errors.Add("Argumentos invalidos para use de tabela");
-                    }
-                    else
-                    {
-                        if ((new string[] { "ingredient", "ingrediente" }).Contains(statements[1]))
-                            _entity = statements[1];
-                        else
-                            errors.Add("Tabela desconhecida");
-                    }
-                    break;
+                    return HandleUse(statements.Skip(1).ToArray());
                 default:
                     errors.Add($"Token desconhecido '{statements[0]}'");
                     break;
@@ -166,6 +152,27 @@ namespace CLI.Processing
                 default:
                     errors.Add($"Entidade desconhecida '{args[0]}'");
                     break;
+            }
+            return ProcessReturn.FromErrors(errors.ToArray());
+        }
+
+        private static ProcessReturn HandleUse(string[] args)
+        {
+            List<string> errors = new List<string>();
+            if (ValidateArguments(args, 0))
+            {
+                _entity = null;
+            }
+            else if (!ValidateArguments(args, 1))
+            {
+                errors.Add("Argumentos invalidos para use de tabela");
+            }
+            else
+            {
+                if ((new string[] { "ingredient", "ingrediente" }).Contains(args[0]))
+                    _entity = args[0];
+                else
+                    errors.Add("Tabela desconhecida");
             }
             return ProcessReturn.FromErrors(errors.ToArray());
         }
