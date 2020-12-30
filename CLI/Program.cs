@@ -18,6 +18,7 @@ namespace CLI
                 Console.ForegroundColor = ConsoleColor.DarkBlue;
                 var reply = ProcessLine(line);
                 if (reply.ShoudClose) return;
+                Console.ForegroundColor = ConsoleColor.Red;
                 if (reply.Errors != null) reply.Errors.ForEach((err) => Console.WriteLine(err));
             }
         }
