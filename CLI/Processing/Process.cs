@@ -18,13 +18,20 @@ namespace CLI.Processing
             public bool ShoudClose { get; private set; }
             public string[] Errors { get; private set; }
 
-            public static ProcessReturn FromErrors(string[] errors) => new ProcessReturn() { Errors = errors };
+            private ProcessReturn(bool shouldClose, string[] errors)
+            {
+                ShoudClose = shouldClose;
+                Errors = errors;
+            }
+            public static ProcessReturn Null => new ProcessReturn(false, null);
 
-            public static ProcessReturn FromShouldClose(bool shouldClose) => new ProcessReturn() { ShoudClose = shouldClose };
+            public static ProcessReturn FromErrors(string[] errors) => new ProcessReturn(false, errors);
+
+            public static ProcessReturn FromShouldClose(bool shouldClose) => new ProcessReturn(shouldClose, null);
         }
 
         private protected static ProcessReturn ProcessLine(string line) => string.IsNullOrWhiteSpace(line)
-                ? new ProcessReturn()
+                ? ProcessReturn.Null
                 : line.StartsWith('\\') ? ProcessMeta(line) : ProcessStatement(line.ToLower().Split(' '));
 
         private static ProcessReturn ProcessMeta(string line)
