@@ -88,10 +88,10 @@ namespace CLI.Processing
             {
                 case "ingrediente":
                 case "ingredient":
-                    if (!ValidateArguments(args, _entity != null ? 3 : 4))
-                        errors.Add($"Numero de argumentos invalido");
+                    if (ValidateArguments(args, _entity != null ? 3 : 4))
+                        Ingredient.Create(args.Skip(_entity != null ? 0 : 1).ToArray(), ref errors, out var _);
                     else
-                        Ingrediente.Create(args.Skip(_entity != null ? 0 : 1).ToArray(), ref errors);
+                        errors.Add($"Numero de argumentos invalido");
                     break;
                 default:
                     errors.Add($"Entidade desconhecida '{args[0]}'");
@@ -109,10 +109,14 @@ namespace CLI.Processing
             {
                 case "ingrediente":
                 case "ingredient":
-                    if (!ValidateArguments(args, _entity != null ? 0 : 1))
-                        errors.Add($"Numero de argumentos invalido");
+                    if (ValidateArguments(args, _entity != null ? 0 : 1))
+                        Ingredient.Select(out var _);
+                    else if (ValidateArguments(args, _entity != null ? 1 : 2))
+                        Ingredient.Select(args[_entity != null ? 0 : 1], ref errors, out var _);
+                    else if (ValidateArguments(args, _entity != null ? 2 : 3))
+                        Ingredient.Select(_entity != null ? args : args.Skip(1).ToArray(), ref errors, out var _);
                     else
-                        Ingrediente.Select();
+                        errors.Add($"Numero de argumentos invalido");
                     break;
                 default:
                     errors.Add($"Entidade desconhecida '{args[0]}'");
@@ -130,10 +134,10 @@ namespace CLI.Processing
             {
                 case "ingrediente":
                 case "ingredient":
-                    if (!ValidateArguments(args, _entity != null ? 3 : 4))
+                    if (!ValidateArguments(args, _entity != null ? 4 : 5))
                         errors.Add($"Numero de argumentos invalido");
                     else
-                        Ingrediente.Update(args.Skip(_entity != null ? 0 : 1).ToArray(), ref errors);
+                        Ingredient.Update(args.Skip(_entity != null ? 0 : 1).ToArray(), ref errors, out var _);
                     break;
                 default:
                     errors.Add($"Entidade desconhecida '{args[0]}'");
@@ -151,10 +155,12 @@ namespace CLI.Processing
             {
                 case "ingrediente":
                 case "ingredient":
-                    if (!ValidateArguments(args, _entity != null ? 1 : 2))
-                        errors.Add($"Numero de argumentos invalido");
+                    if (ValidateArguments(args, _entity != null ? 1 : 2))
+                        Ingredient.Delete(args[_entity != null ? 0 : 1], ref errors);
+                    else if (ValidateArguments(args, _entity != null ? 2 : 3))
+                        Ingredient.Delete(_entity != null ? args : args.Skip(1).ToArray(), ref errors);
                     else
-                        Ingrediente.Delete(args[_entity != null ? 0 : 1], ref errors);
+                        errors.Add($"Numero de argumentos invalido");
                     break;
                 default:
                     errors.Add($"Entidade desconhecida '{args[0]}'");
