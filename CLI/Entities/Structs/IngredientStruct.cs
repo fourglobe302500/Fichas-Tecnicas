@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CLI.Entities
+namespace CLI.Entities.Structs
 {
     internal struct IngredientStruct
     {

@@ -93,6 +93,13 @@ namespace CLI.Processing
                     else
                         errors.Add($"Numero de argumentos invalido");
                     break;
+                case "recipe":
+                case "receita":
+                    if (ValidateArguments(args, _entity != null ? 1 : 2))
+                        Recipe.Create(args.Skip(_entity != null ? 0 : 1).ToArray(), ref errors, out var _);
+                    else
+                        errors.Add($"Numero de argumentos invalido");
+                    break;
                 default:
                     errors.Add($"Entidade desconhecida '{args[0]}'");
                     break;
@@ -118,6 +125,17 @@ namespace CLI.Processing
                     else
                         errors.Add($"Numero de argumentos invalido");
                     break;
+                case "recipe":
+                case "receita":
+                    if (ValidateArguments(args, _entity != null ? 0 : 1))
+                        Recipe.Select(out var _);
+                    //else if (ValidateArguments(args, _entity != null ? 1 : 2))
+                    //    Ingredient.Select(args[_entity != null ? 0 : 1], ref errors, out var _);
+                    //else if (ValidateArguments(args, _entity != null ? 2 : 3))
+                    //    Ingredient.Select(_entity != null ? args : args.Skip(1).ToArray(), ref errors, out var _);
+                    else
+                        errors.Add($"Numero de argumentos invalido");
+                    break;
                 default:
                     errors.Add($"Entidade desconhecida '{args[0]}'");
                     break;
@@ -138,6 +156,9 @@ namespace CLI.Processing
                         errors.Add($"Numero de argumentos invalido");
                     else
                         Ingredient.Update(args.Skip(_entity != null ? 0 : 1).ToArray(), ref errors, out var _);
+                    break;
+                case "recipe":
+                case "receita":
                     break;
                 default:
                     errors.Add($"Entidade desconhecida '{args[0]}'");
@@ -162,6 +183,9 @@ namespace CLI.Processing
                     else
                         errors.Add($"Numero de argumentos invalido");
                     break;
+                case "recipe":
+                case "receita":
+                    break;
                 default:
                     errors.Add($"Entidade desconhecida '{args[0]}'");
                     break;
@@ -182,7 +206,7 @@ namespace CLI.Processing
             }
             else
             {
-                if ((new string[] { "ingredient", "ingrediente" }).Contains(args[0]))
+                if ((new string[] { "ingredient", "ingrediente", "recipe", "receita" }).Contains(args[0]))
                     _entity = args[0];
                 else
                     errors.Add("Tabela desconhecida");

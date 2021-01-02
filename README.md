@@ -6,7 +6,7 @@
 - [x] Ingredient db
 - [x] Ingredient db CRUD
   - [x] Create
-  - [x] Request
+  - [x] Read
   - [x] Update
   - [x] Delete
 - [x] Use Table (simplify syntax)
@@ -14,12 +14,13 @@
 - [x] Pretty Print
 - [x] Inner acess for ingredient CRUD
 - [x] Better CRUD
-- [ ] Recipes db CRUD
-  - [ ] Create
-  - [ ] Request
+- [x] Recipes db CRUD
+  - [x] Create
+  - [x] Read
   - [ ] Update
   - [ ] Delete
-- [ ] Recipes
+- [ ] Single Recipe
+- [ ] Better Recipe CRUD
 - [ ] User Entry
 
 ---

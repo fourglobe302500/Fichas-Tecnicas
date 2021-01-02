@@ -2,10 +2,30 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using CLI.Entities.Structs;
+
 namespace CLI.Utils
 {
     internal static class Utils
     {
+        public static string ToArrayString(this Link[] values)
+        {
+            if (values == null)
+                return "[]";
+            string res = "";
+            values.Select(obj => obj.ToString()).ForEach(str => res += str + ", ");
+            return res.Length >= 2 ? $"[{res[0..^2]}]" : "[]";
+        }
+
+        public static string ToArrayString(this object[] values)
+        {
+            if (values == null)
+                return "[]";
+            string res = "";
+            values.Select(obj => obj.ToString()).ForEach(str => res += str + ", ");
+            return res.Length >= 2 ? $"[{res[0..^2]}]" : "[]";
+        }
+
         public static void PrettyPrint(this IEnumerable<string> values, string[] keys) => values.PrettyPrint(keys, keys.Length);
 
         public static void PrettyPrint(this IEnumerable<string> values, string[] keys, int keysLenght)
