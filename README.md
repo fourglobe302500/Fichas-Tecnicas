@@ -40,8 +40,4 @@ Currently this application suppurts in full scale ingredients and is working tow
 
 ### Documentation
 
-- For [Documentation](https://github.com/fourglobe302500/Fichas-Tecnicas/Docs/docs.md)
-
-- For [Tutorial](https://github.com/fourglobe302500/Fichas-Tecnicas/Docs/tutorial.md)
-
-- For [Instalation](https://github.com/fourglobe302500/Fichas-Tecnicas/Docs/install.md)
+- For [Instalation](https://github.com/fourglobe302500/Fichas-Tecnicas/tree/master/Docs/install.md)
