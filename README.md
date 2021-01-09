@@ -1,5 +1,7 @@
 # Ficha Tecnicas Para a Tomateira
 
+---
+
 ## Must Make
 
 - [x] Create CLI
@@ -24,10 +26,22 @@
 - [ ] Better Recipe CRUD
 - [ ] User Entry
 
----
-
 ### Update After Production Deploy
 
 - [ ] Clean Code
 - [ ] Create Print Function
 - [ ] Auto-Complete
+
+---
+
+## Info
+
+Currently this application suppurts in full scale ingredients and is working towards full support for recipes
+
+### Documentation
+
+- For [Documentation](https://github.com/fourglobe302500/Fichas-Tecnicas/Docs/docs.md)
+
+- For [Tutorial](https://github.com/fourglobe302500/Fichas-Tecnicas/Docs/tutorial.md)
+
+- For [Instalation](https://github.com/fourglobe302500/Fichas-Tecnicas/Docs/install.md)
