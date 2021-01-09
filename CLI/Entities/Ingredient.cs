@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 
 using CLI.Entities.Structs;
-using CLI.Utils;
+using CLI.Utilities;
 
 namespace CLI.Entities
 {
@@ -122,6 +122,22 @@ namespace CLI.Entities
                 ingredient.rendimento.ToString(),
                 ingredient.price.ToString() });
             Data.PrettyPrint(new string[] { "id", "Ingrediente", "Rendimento", "Preço" });
+        }
+
+        internal static bool SelectI(int index, ref List<string> errors, out IngredientStruct Data)
+        {
+            var IData = LoadData().Where(ingredient => ingredient.id == index);
+            if (IData.Any())
+            {
+                Data = IData.Single();
+                return true;
+            }
+            else
+            {
+                Data = new IngredientStruct();
+                errors.Add($"Ingrediente de index {index} não existe.");
+                return false;
+            }
         }
 
         #endregion Reading

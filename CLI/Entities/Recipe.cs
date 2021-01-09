@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 
 using CLI.Entities.Structs;
-using CLI.Utils;
+using CLI.Utilities;
 
 namespace CLI.Entities
 {
@@ -52,8 +52,39 @@ namespace CLI.Entities
         internal static void Select(out IEnumerable<string> Data)
         {
             Data = LoadData().SelectMany(recipe => new string[] {
-                        recipe.id.ToString(), recipe.name, recipe.links.ToArrayString()});
-            Data.PrettyPrint(new string[] { "id", "Recipe", "Links" });
+                        recipe.id.ToString(), recipe.name });
+            Data.PrettyPrint(new string[] { "id", "Recipe" });
+        }
+
+        internal static void Select(string id, ref List<string> errors, out RecipeStruct Data)
+        {
+            if (int.TryParse(id, out var index))
+            {
+                var error = new List<string>();
+                Data = LoadData().Where(recipe => recipe.id == index).SingleOrDefault();
+                Utils.WriteValues("Dados", (Data.id, "index"), (Data.name, "name"));
+                Data.links
+                    .OrderBy(link => link.ingredientId)
+                    .Select<Link, (Link link, IngredientStruct ingredient)>(
+                        link => (link,
+                            Ingredient.SelectI(link.ingredientId, ref error, out var ingredient) ? ingredient : new IngredientStruct()))
+                    .SelectMany(link => new string[] {
+                        link.link.ingredientId.ToString(),
+                        link.ingredient.name,
+                        link.link.quantity.ToString(),
+                        (1 / link.ingredient.rendimento).ToString(),
+                        link.ingredient.rendimento.ToString(),
+                        (link.link.quantity / (1 / link.ingredient.rendimento)).ToString(),
+                        link.link.price.ToString(),
+                        (link.link.quantity / (1 / link.ingredient.rendimento) * link.link.price).ToString()
+                    })
+                    .PrettyPrint(new string[] { "index", "Nome", "Qtdd Liq.", "FC", "Rend", "Qtdd bruta", "Unitario", "Preço bruto" }, "Ingredientes");
+            }
+            else
+            {
+                Data = new RecipeStruct();
+                errors.Add("Numero integral index em formato invalido");
+            }
         }
 
         //internal static void Select(string index, ref List<string> errors, out IEnumerable<string> Data)
@@ -273,7 +304,6 @@ namespace CLI.Entities
                         }
                         current = (current.ingredientId, current.quantity, float.Parse(changing.Replace('.', ',')));
                         result.Add(current);
-                        current = (0, 0, 0);
                         continue;
                 }
             }

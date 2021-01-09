@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-using CLI.Utils;
+using CLI.Utilities;
 
 namespace CLI.Entities.Structs
 {

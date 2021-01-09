@@ -19,6 +19,7 @@
   - [x] Read
   - [ ] Update
   - [ ] Delete
+- [x] Prettier Print
 - [ ] Single Recipe
 - [ ] Better Recipe CRUD
 - [ ] User Entry

@@ -1,7 +1,7 @@
 ﻿using System;
 
 using CLI.Processing;
-using CLI.Utils;
+using CLI.Utilities;
 
 namespace CLI
 {

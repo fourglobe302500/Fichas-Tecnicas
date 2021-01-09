@@ -129,10 +129,10 @@ namespace CLI.Processing
                 case "receita":
                     if (ValidateArguments(args, _entity != null ? 0 : 1))
                         Recipe.Select(out var _);
-                    //else if (ValidateArguments(args, _entity != null ? 1 : 2))
-                    //    Ingredient.Select(args[_entity != null ? 0 : 1], ref errors, out var _);
+                    else if (ValidateArguments(args, _entity != null ? 1 : 2))
+                        Recipe.Select(args[_entity != null ? 0 : 1], ref errors, out var _);
                     //else if (ValidateArguments(args, _entity != null ? 2 : 3))
-                    //    Ingredient.Select(_entity != null ? args : args.Skip(1).ToArray(), ref errors, out var _);
+                    //    Recipe.Select(_entity != null ? args : args.Skip(1).ToArray(), ref errors, out var _);
                     else
                         errors.Add($"Numero de argumentos invalido");
                     break;
