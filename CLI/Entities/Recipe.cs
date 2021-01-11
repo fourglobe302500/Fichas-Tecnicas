@@ -62,7 +62,8 @@ namespace CLI.Entities
             {
                 var error = new List<string>();
                 Data = LoadData().Where(recipe => recipe.id == index).SingleOrDefault();
-                Utils.WriteValues("Dados", (Data.id, "index"), (Data.name, "name"));
+                if (Processing.Process.showData)
+                    Utils.WriteValues("Dados", (Data.id, "index"), (Data.name, "name"));
                 Data.links
                     .OrderBy(link => link.ingredientId)
                     .Select<Link, (Link link, IngredientStruct ingredient)>(
@@ -177,7 +178,8 @@ namespace CLI.Entities
                 .ToArray());
             Data = LoadData().Where(recipe => recipe.id == id).Single();
             var error = new List<string>();
-            Utils.WriteValues("New Recipe", (Data.id, "index"), (Data.name, "name"));
+            if (Processing.Process.showData)
+                Utils.WriteValues("New Recipe", (Data.id, "index"), (Data.name, "name"));
             Data.links
                 .OrderBy(link => link.ingredientId)
                 .Select<Link, (Link link, IngredientStruct ingredient)>(

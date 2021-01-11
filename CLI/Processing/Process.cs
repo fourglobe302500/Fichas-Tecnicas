@@ -8,6 +8,7 @@ namespace CLI.Processing
 {
     internal class Process
     {
+        public static bool showData = true;
         private protected static string _user = null;
         private protected static string _entity = null;
 
@@ -44,6 +45,11 @@ namespace CLI.Processing
                     break;
                 case "\\cls":
                     Console.Clear();
+                    break;
+                case "\\noData":
+                    showData = !showData;
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"{(!showData ? "not " : "")}showing data");
                     break;
             }
             return ProcessReturn.FromShouldClose(shouldClose);
