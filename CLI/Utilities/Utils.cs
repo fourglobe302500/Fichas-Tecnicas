@@ -13,8 +13,8 @@ namespace CLI.Utilities
             if (values == null)
                 return "[]";
             string res = "";
-            values.Select(obj => obj.ToString()).ForEach(str => res += str + ", ");
-            return res.Length >= 2 ? $"[{res[0..^2]}]" : "[]";
+            values.Select(obj => obj.ToString()).ForEach(str => res += str + ";");
+            return res.Length >= 2 ? $"[{res[0..^1]}]" : "[]";
         }
 
         public static string ToArrayString(this object[] values)
