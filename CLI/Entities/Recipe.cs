@@ -79,6 +79,7 @@ namespace CLI.Entities
                         (link.link.quantity / (1 / link.ingredient.rendimento) * link.link.price).ToString()
                     })
                     .PrettyPrint(new string[] { "index", "Nome", "Qtdd Liq.", "FC", "Rend", "Qtdd bruta", "Unitario", "Preço bruto" }, "Ingredientes");
+                errors.AddRange(error);
             }
             else
             {
@@ -151,53 +152,71 @@ namespace CLI.Entities
 
         #endregion Reading
 
+        #region Updating
+
+        internal static void Update(string[] args, ref List<string> errors, out RecipeStruct Data)
+        {
+            Data = new RecipeStruct();
+            var newRecipe = Construct(args.Skip(1).ToArray());
+            if (errors.Any())
+                return;
+
+            var processedData = LoadData();
+
+            if (int.TryParse(args[0], out var id) && !processedData.Any((recipe) => recipe.id == id))
+            {
+                errors.Add($"Receita de index {args[0]} não existe");
+                return;
+            }
+
+            Write(
+                processedData.Select(
+                    recipe => recipe.id != id
+                        ? recipe.ToString()
+                        : new RecipeStruct(recipe.id, args[1], recipe.links).ToString())
+                .ToArray());
+            Data = LoadData().Where(recipe => recipe.id == id).Single();
+            var error = new List<string>();
+            Utils.WriteValues("New Recipe", (Data.id, "index"), (Data.name, "name"));
+            Data.links
+                .OrderBy(link => link.ingredientId)
+                .Select<Link, (Link link, IngredientStruct ingredient)>(
+                    link => (link,
+                        Ingredient.SelectI(link.ingredientId, ref error, out var ingredient) ? ingredient : new IngredientStruct()))
+                .SelectMany(link => new string[] {
+                        link.link.ingredientId.ToString(),
+                        link.ingredient.name,
+                        link.link.quantity.ToString(),
+                        (1 / link.ingredient.rendimento).ToString(),
+                        link.ingredient.rendimento.ToString(),
+                        (link.link.quantity / (1 / link.ingredient.rendimento)).ToString(),
+                        link.link.price.ToString(),
+                        (link.link.quantity / (1 / link.ingredient.rendimento) * link.link.price).ToString()
+                })
+                .PrettyPrint(new string[] { "index", "Nome", "Qtdd Liq.", "FC", "Rend", "Qtdd bruta", "Unitario", "Preço bruto" }, "Links");
+            errors.AddRange(error);
+        }
+
+        #endregion Updating
+
+        #region Deleting
+
+        internal static void Delete(string index, ref List<string> errors)
+        {
+            if (int.TryParse(index, out var id))
+            {
+                var processedData = LoadData();
+                if (processedData.Any((recipe) => recipe.id == id))
+                    Write(processedData.Where(recipe => recipe.id != id).Select(recipe => recipe.ToString()).ToArray());
+                else
+                    errors.AddRange(new string[] { $"Receita {id} não existe", "Incapaz de deletar a receita por razões internas" });
+            }
+            else
+            {
+                errors.Add("Numero integral 'index' em formato invalido");
+            }
+        }
         /* TODO
-
-                #region Updating
-
-                internal static void Update(string[] args, ref List<string> errors, out IEnumerable<string> Data)
-                {
-                    Data = null;
-                    var upIngredient = Construct(args.Skip(1).ToArray(), ref errors);
-                    if (errors.Any())
-                        return;
-
-                    var processedData = LoadData();
-
-                    if (int.TryParse(args[0], out var id) && !processedData.Any((ingrediente) => ingrediente.id == id))
-                    {
-                        errors.Add($"Ingrediente de id {args[0]} não existe");
-                        return;
-                    }
-                    Write(processedData.Select(
-                            ingredient => ingredient.id != id
-                            ? ingredient.ToString()
-                            : new IngredientStruct(ingredient.id, upIngredient.Name, upIngredient.Rendimento, upIngredient.Price).ToString())
-                        .ToArray());
-                    Data = new List<string>() { id.ToString(), upIngredient.Name, upIngredient.Rendimento.ToString(), upIngredient.Price.ToString() };
-                    Console.WriteLine($"id: {id}, Ingrediente: {upIngredient.Name}, Rendimento: {upIngredient.Rendimento}, Preço/Kg: {upIngredient.Price}");
-                }
-
-                #endregion Updating
-
-                #region Deleting
-
-                internal static void Delete(string index, ref List<string> errors)
-                {
-                    if (int.TryParse(index, out var id))
-                    {
-                        var processedData = LoadData();
-                        if (processedData.Any((Ingrediente) => Ingrediente.id == id))
-                            Write(processedData.Where(ingredient => ingredient.id != id).Select(ingrediente => ingrediente.ToString()).ToArray());
-                        else
-                            errors.AddRange(new string[] { $"Ingrediente {id} não existe", "Incapaz de deletar o ingrediente por razões internas" });
-                    }
-                    else
-                    {
-                        errors.Add("Numero integral 'index' em formato invalido");
-                    }
-                }
-
                 internal static void Delete(string[] args, ref List<string> errors)
                 {
                     var data = LoadData();
@@ -235,9 +254,9 @@ namespace CLI.Entities
                     Write(sorted.Select(ingredient => ingredient.ToString()).ToArray());
                 }
 
-                #endregion Deleting
-
         */
+
+        #endregion Deleting
 
         #region Utilities
 

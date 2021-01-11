@@ -159,6 +159,10 @@ namespace CLI.Processing
                     break;
                 case "recipe":
                 case "receita":
+                    if (!ValidateArguments(args, _entity != null ? 2 : 3))
+                        errors.Add($"Numero de argumentos invalido");
+                    else
+                        Recipe.Update(args.Skip(_entity != null ? 0 : 1).ToArray(), ref errors, out var _);
                     break;
                 default:
                     errors.Add($"Entidade desconhecida '{args[0]}'");
@@ -185,6 +189,10 @@ namespace CLI.Processing
                     break;
                 case "recipe":
                 case "receita":
+                    if (ValidateArguments(args, _entity != null ? 1 : 2))
+                        Recipe.Delete(args[_entity != null ? 0 : 1], ref errors);
+                    else
+                        errors.Add("Numero de argumentos invalido");
                     break;
                 default:
                     errors.Add($"Entidade desconhecida '{args[0]}'");
