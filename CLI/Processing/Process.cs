@@ -72,6 +72,10 @@ namespace CLI.Processing
                 case "deletar":
                 case "delete":
                     return HandleDelete(statements.Skip(1).ToArray());
+                case "link":
+                    return HandleLink(statements.Skip(1).ToArray());
+                case "unlink":
+                    return HandleUnlink(statements.Skip(1).ToArray());
                 case "use":
                     return HandleUse(statements.Skip(1).ToArray());
                 default:
@@ -202,6 +206,42 @@ namespace CLI.Processing
                     break;
                 default:
                     errors.Add($"Entidade desconhecida '{args[0]}'");
+                    break;
+            }
+            return ProcessReturn.FromErrors(errors.ToArray());
+        }
+
+        private static ProcessReturn HandleLink(string[] args)
+        {
+            if (!Valid(args))
+                return ProcessReturn.FromErrors(new string[] { "Faltanda entidade para ser linkada" });
+            List<string> errors = new List<string>();
+            switch (_entity ?? args[0])
+            {
+                case "recipe":
+                case "receita":
+                    if (ValidateArguments(args, _entity != null ? 4 : 5))
+                        Recipe.Link(_entity != null ? args : args.Skip(1).ToArray(), ref errors, out var _);
+                    else
+                        errors.Add("Numero de argumentos invalido");
+                    break;
+            }
+            return ProcessReturn.FromErrors(errors.ToArray());
+        }
+
+        private static ProcessReturn HandleUnlink(string[] args)
+        {
+            if (!Valid(args))
+                return ProcessReturn.FromErrors(new string[] { "Faltanda entidade para ser deslinkada" });
+            List<string> errors = new List<string>();
+            switch (_entity ?? args[0])
+            {
+                case "recipe":
+                case "receita":
+                    if (ValidateArguments(args, _entity != null ? 2 : 5))
+                        Recipe.Unlink(_entity != null ? args : args.Skip(1).ToArray(), ref errors);
+                    else
+                        errors.Add("Numero de argumentos invalido");
                     break;
             }
             return ProcessReturn.FromErrors(errors.ToArray());

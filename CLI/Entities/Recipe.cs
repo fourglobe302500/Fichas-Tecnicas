@@ -260,6 +260,44 @@ namespace CLI.Entities
 
         #endregion Deleting
 
+        #region Linking
+
+        internal static void Link(string[] args, ref List<string> errors, out RecipeStruct Data)
+        {
+            Data = new RecipeStruct();
+            if (!int.TryParse(args[0], out var id))
+                errors.Add("Numero integral index em formato invalido");
+            var link = Link(args[1..^0], ref errors);
+            var processedData = LoadData();
+            Write(processedData.Select(recipe => recipe.id == id
+                    ? new RecipeStruct(id, recipe.name, recipe.links.Append(link).ToArray()).ToString()
+                    : recipe.ToString()).ToArray());
+            if (errors.Any())
+                return;
+            Select(args[0], ref errors, out Data);
+        }
+
+        internal static void Unlink(string[] args, ref List<string> errors)
+        {
+            if (!int.TryParse(args[0], out var recId) || !int.TryParse(args[1], out var ingId))
+            {
+                errors.Add("Numero integral index em formato invalido");
+                return;
+            }
+            var processedData = LoadData();
+            if (!processedData.Any(recipe => recipe.id != recId ? false : recipe.links.Any(link => link.ingredientId == ingId)))
+            {
+                errors.Add($"Link do ingredient {recId} e ingrediente {ingId} não existe");
+                return;
+            }
+            Write(LoadData().Select(recipe => recipe.id == recId
+                    ? new RecipeStruct(recId, recipe.name, recipe.links.Where(link => link.ingredientId != ingId).ToArray()).ToString()
+                    : recipe.ToString()).ToArray());
+            Select(args[0], ref errors, out var _);
+        }
+
+        #endregion Linking
+
         #region Utilities
 
         private static Recipe Construct(string[] args) => new Recipe(args.Single(), null);
