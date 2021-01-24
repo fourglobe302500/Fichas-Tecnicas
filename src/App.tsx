@@ -1,4 +1,4 @@
-import { Box } from "@material-ui/core";
+import { Box, Link } from "@material-ui/core";
 import React from "react";
 import { Content } from "./components/Content";
 import { Header } from "./components/Header";
@@ -17,7 +17,18 @@ function App() {
       marginX="4rem"
     >
       <Header></Header>
-      <Content>Hello this page is under development</Content>
+      <Content>
+        <Link
+          style={{ textDecoration: "none", color: "cyan" }}
+          href="/Fichas-Tecnicas/App.zip"
+        >
+          Click Here To Download
+        </Link>
+      </Content>
+      <Content>
+        For this application to work you must have 'C:\Data\Fichas_Tecnicas\'
+        valid path in your computer
+      </Content>
     </Box>
   );
 }
