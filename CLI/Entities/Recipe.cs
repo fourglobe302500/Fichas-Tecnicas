@@ -306,16 +306,16 @@ namespace CLI.Entities
         {
             if (!int.TryParse(args[0], out var id))
                 errors.Add($"Index em fomato invalido {args[0]}");
-            if (!float.TryParse(args[1].Replace('.', ','), out var rendimento))
-                errors.Add($"Rendimento em fomato invalido {args[1]}");
+            if (!float.TryParse(args[1].Replace('.', ','), out var quantity))
+                errors.Add($"Quantidade em fomato invalido {args[1]}");
             if (!float.TryParse(args[2].Replace('.', ','), out var price))
                 errors.Add($"Preço em fomato invalido {args[2]}");
-            return (id, rendimento, price);
+            return (id, quantity, price);
         }
 
         private static void Write(string[] vals) => File.WriteAllLines(_filePath, vals);
 
-        private static RecipeStruct[] LoadData( )
+        private static RecipeStruct[] LoadData()
         {
             if (!File.Exists(_filePath))
                 File.Create(_filePath).Close();

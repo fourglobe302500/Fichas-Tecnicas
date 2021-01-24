@@ -51,6 +51,181 @@ namespace CLI.Processing
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine($"{(!showData ? "not " : "")}showing data");
                     break;
+                case "\\?":
+                case "\\h":
+                case "\\help":
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(Environment.NewLine + new string('-', Console.WindowWidth * 2));
+                    Console.Write(@"
+Help Menu
+To detailed help enter: \help <command>
+
+select, selecionar:
+
+    Selects the data of an object from a table.
+
+create, novo:
+
+    Crates a new data object in a table.
+
+update, atualizar:
+
+    Update the data of an object of a table.
+
+delete, deletar:
+
+    Delete an object of a table.
+
+link, linkar:
+
+    Links a object from a table to a object of another table.
+
+unlink, deslinkar:
+
+    Unlinks a object from a table to a object of another table.
+
+use:
+
+    Syntax sugar for table selection.
+
+");
+                    break;
+                case "\\help select":
+                case "\\help selecionar":
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(Environment.NewLine + new string('-', Console.WindowWidth * 2));
+                    Console.Write(@"
+Help Menu
+
+    Syntax:
+        [select | selecionar] *table
+
+            Selects all data of a table**.
+
+        [select | selecionar] *table <id>
+
+            Selects all data of a object in a table of matching id.
+
+        [select | selecionar] *table <key> <value>
+
+            Select all data of all matching object where the value of the key atribute is equals to the value parameter***.
+
+    * Not necessary when using use syntax.
+
+    ** Will not select array or linked object data.
+
+    *** Currently does this syntax doesn't work with the recipes table.
+
+");
+                    break;
+                case "\\help create":
+                case "\\help novo":
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(Environment.NewLine + new string('-', Console.WindowWidth * 2));
+                    Console.Write(@"
+Help Menu
+
+    Syntax:
+        [create | novo] *table <values>
+
+            Creates a new object in the table with the values.
+
+    * Not necessary when using use syntax.
+
+    Values order:
+
+        ingredient: <nome: string> <rendimento: float> <preço: float>
+        recipe: <nome: string>
+
+");
+                    break;
+                case "\\help update":
+                case "\\help atualizar":
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(Environment.NewLine + new string('-', Console.WindowWidth * 2));
+                    Console.Write(@"
+Help Menu
+
+    Syntax:
+        [update | atualizar] *table <id> <values>
+
+            Updates the object of id data to the new values.
+
+    * Not necessary when using use syntax.
+
+    Values order:
+
+        ingredient: <nome: string> <rendimento: float> <preço: float>
+        recipe: <nome: string>
+
+");
+                    break;
+                case "\\help delete":
+                case "\\help deletar":
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(Environment.NewLine + new string('-', Console.WindowWidth * 2));
+                    Console.Write(@"
+Help Menu
+
+    Syntax:
+        [delete | deletar] *table <id>
+
+            Deletes the object of id.
+
+    * Not necessary when using use syntax.
+
+");
+                    break;
+                case "\\help link":
+                case "\\help linkar":
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(Environment.NewLine + new string('-', Console.WindowWidth * 2));
+                    Console.Write(@"
+Help Menu
+
+    Syntax:
+        [link | linkar] *recipe <id> <values>
+
+            Makes a link of a ingredient with a recipe.
+
+    * Not necessary when using use syntax.
+
+    Values order:
+
+        <id: int> <quantidade: float> <preço: float>
+
+");
+                    break;
+                case "\\help unlink":
+                case "\\help deslinkar":
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(Environment.NewLine + new string('-', Console.WindowWidth * 2));
+                    Console.Write(@"
+Help Menu
+
+    Syntax:
+        [unlink | deslinkar] *recipe <id1> <id2>
+
+            Unlinks the ingredient of id2 from the recipe of id1.
+
+    * Not necessary when using use syntax.
+
+");
+                    break;
+                case "\\help use":
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(Environment.NewLine + new string('-', Console.WindowWidth * 2));
+                    Console.Write(@"
+Help Menu
+
+    Syntax:
+        use table
+
+            Autofill the table option of all commands making then unnecessary, but with one table selected you can't use the command to read other.
+            Enter '\use' to nullify the selection of table.
+
+");
+                    break;
             }
             return ProcessReturn.FromShouldClose(shouldClose);
         }
@@ -73,8 +248,10 @@ namespace CLI.Processing
                 case "delete":
                     return HandleDelete(statements.Skip(1).ToArray());
                 case "link":
+                case "linkar":
                     return HandleLink(statements.Skip(1).ToArray());
                 case "unlink":
+                case "deslinkar":
                     return HandleUnlink(statements.Skip(1).ToArray());
                 case "use":
                     return HandleUse(statements.Skip(1).ToArray());

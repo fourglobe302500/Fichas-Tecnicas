@@ -560,3 +560,4 @@ $RECYCLE.BIN/
 **/*.ico
 **/*.zip
 !instagram.ico
+build/
