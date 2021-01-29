@@ -4,32 +4,29 @@
     {
         public int ingredientId;
         public float quantity;
-        public float price;
 
-        public Link(int ingredientId, float quantity, float price)
+        public Link(int ingredientId, float quantity)
         {
             this.ingredientId = ingredientId;
             this.quantity = quantity;
-            this.price = price;
         }
 
-        public override bool Equals(object obj) => obj is Link other && ingredientId == other.ingredientId && quantity == other.quantity && price == other.price;
+        public override bool Equals(object obj) => obj is Link other && ingredientId == other.ingredientId && quantity == other.quantity;
 
-        public override int GetHashCode( ) => System.HashCode.Combine(ingredientId, quantity, price);
+        public override int GetHashCode() => System.HashCode.Combine(ingredientId, quantity);
 
-        public void Deconstruct(out int ingredientId, out float quantity, out float price)
+        public void Deconstruct(out int ingredientId, out float quantity)
         {
             ingredientId = this.ingredientId;
             quantity = this.quantity;
-            price = this.price;
         }
 
-        public string ToStringPrint( ) => $"{{id: {ingredientId}, Quantidade: {quantity}, Preço/Un: {price}}}";
+        public string ToStringPrint() => $"{{id: {ingredientId}, Quantidade: {quantity}}}";
 
-        public override string ToString( ) => $"{{{ingredientId}:{quantity.ToString().Replace(',', '.')}:{price.ToString().Replace(',', '.')}}}";
+        public override string ToString() => $"{{{ingredientId}:{quantity.ToString().Replace(',', '.')}}}";
 
-        public static implicit operator (int ingredientId, float quantity, float price)(Link value) => (value.ingredientId, value.quantity, value.price);
+        public static implicit operator (int ingredientId, float quantity)(Link value) => (value.ingredientId, value.quantity);
 
-        public static implicit operator Link((int ingredientId, float quantity, float price) value) => new Link(value.ingredientId, value.quantity, value.price);
+        public static implicit operator Link((int ingredientId, float quantity) value) => new Link(value.ingredientId, value.quantity);
     }
 }

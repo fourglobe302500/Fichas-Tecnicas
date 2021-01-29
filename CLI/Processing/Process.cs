@@ -88,10 +88,26 @@ use:
 
     Syntax sugar for table selection.
 
+\q:
+
+    Quits the application.
+
+\cls:
+
+    Clears the screen.
+
+\noData:
+
+    Omits the header of recipes selection.
+
 ");
                     break;
                 case "\\help select":
                 case "\\help selecionar":
+                case "\\h select":
+                case "\\h selecionar":
+                case "\\? select":
+                case "\\? selecionar":
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write(Environment.NewLine + new string('-', Console.WindowWidth * 2));
                     Console.Write(@"
@@ -120,6 +136,10 @@ Help Menu
                     break;
                 case "\\help create":
                 case "\\help novo":
+                case "\\h create":
+                case "\\h novo":
+                case "\\? create":
+                case "\\? novo":
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write(Environment.NewLine + new string('-', Console.WindowWidth * 2));
                     Console.Write(@"
@@ -135,12 +155,16 @@ Help Menu
     Values order:
 
         ingredient: <nome: string> <rendimento: float> <preço: float>
-        recipe: <nome: string>
+        recipe: <nome: string> <rendimento: float>
 
 ");
                     break;
                 case "\\help update":
                 case "\\help atualizar":
+                case "\\h update":
+                case "\\h atualizar":
+                case "\\? update":
+                case "\\? atualizar":
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write(Environment.NewLine + new string('-', Console.WindowWidth * 2));
                     Console.Write(@"
@@ -156,12 +180,16 @@ Help Menu
     Values order:
 
         ingredient: <nome: string> <rendimento: float> <preço: float>
-        recipe: <nome: string>
+        recipe: <nome: string> <rendimento: float>
 
 ");
                     break;
                 case "\\help delete":
                 case "\\help deletar":
+                case "\\h delete":
+                case "\\h deletar":
+                case "\\? delete":
+                case "\\? deletar":
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write(Environment.NewLine + new string('-', Console.WindowWidth * 2));
                     Console.Write(@"
@@ -178,6 +206,10 @@ Help Menu
                     break;
                 case "\\help link":
                 case "\\help linkar":
+                case "\\h link":
+                case "\\h linkar":
+                case "\\? link":
+                case "\\? linkar":
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write(Environment.NewLine + new string('-', Console.WindowWidth * 2));
                     Console.Write(@"
@@ -198,6 +230,10 @@ Help Menu
                     break;
                 case "\\help unlink":
                 case "\\help deslinkar":
+                case "\\h unlink":
+                case "\\h deslinkar":
+                case "\\? unlink":
+                case "\\? deslinkar":
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write(Environment.NewLine + new string('-', Console.WindowWidth * 2));
                     Console.Write(@"
@@ -213,6 +249,8 @@ Help Menu
 ");
                     break;
                 case "\\help use":
+                case "\\h use":
+                case "\\? use":
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write(Environment.NewLine + new string('-', Console.WindowWidth * 2));
                     Console.Write(@"
@@ -282,7 +320,7 @@ Help Menu
                     break;
                 case "recipe":
                 case "receita":
-                    if (ValidateArguments(args, _entity != null ? 1 : 2))
+                    if (ValidateArguments(args, _entity != null ? 2 : 3))
                         Recipe.Create(args.Skip(_entity != null ? 0 : 1).ToArray(), ref errors, out var _);
                     else
                         errors.Add($"Numero de argumentos invalido");
@@ -318,8 +356,6 @@ Help Menu
                         Recipe.Select(out var _);
                     else if (ValidateArguments(args, _entity != null ? 1 : 2))
                         Recipe.Select(args[_entity != null ? 0 : 1], ref errors, out var _);
-                    //else if (ValidateArguments(args, _entity != null ? 2 : 3))
-                    //    Recipe.Select(_entity != null ? args : args.Skip(1).ToArray(), ref errors, out var _);
                     else
                         errors.Add($"Numero de argumentos invalido");
                     break;
@@ -346,10 +382,10 @@ Help Menu
                     break;
                 case "recipe":
                 case "receita":
-                    if (!ValidateArguments(args, _entity != null ? 2 : 3))
-                        errors.Add($"Numero de argumentos invalido");
-                    else
+                    if (ValidateArguments(args, _entity != null ? 3 : 4))
                         Recipe.Update(args.Skip(_entity != null ? 0 : 1).ToArray(), ref errors, out var _);
+                    else
+                        errors.Add($"Numero de argumentos invalido");
                     break;
                 default:
                     errors.Add($"Entidade desconhecida '{args[0]}'");
@@ -397,7 +433,7 @@ Help Menu
             {
                 case "recipe":
                 case "receita":
-                    if (ValidateArguments(args, _entity != null ? 4 : 5))
+                    if (ValidateArguments(args, _entity != null ? 3 : 4))
                         Recipe.Link(_entity != null ? args : args.Skip(1).ToArray(), ref errors, out var _);
                     else
                         errors.Add("Numero de argumentos invalido");
@@ -415,7 +451,7 @@ Help Menu
             {
                 case "recipe":
                 case "receita":
-                    if (ValidateArguments(args, _entity != null ? 2 : 5))
+                    if (ValidateArguments(args, _entity != null ? 2 : 3))
                         Recipe.Unlink(_entity != null ? args : args.Skip(1).ToArray(), ref errors);
                     else
                         errors.Add("Numero de argumentos invalido");

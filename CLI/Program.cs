@@ -7,8 +7,10 @@ namespace CLI
 {
     class Program : Process
     {
-        static void Main( )
+        static void Main()
         {
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("For help enter '\\?'\n");
             while (true)
             {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;

@@ -39,7 +39,7 @@ namespace CLI.Utilities
             text[^1] = "└";
             for (var i = 0; i < values.Length; i++)
             {
-                BiggestName = Math.Max(BiggestName, values[i].name.Length);
+                BiggestName = Math.Max(BiggestName, values[i].name.Length + 1);
                 BiggestValue = Math.Max(BiggestValue, values[i].value.ToString().Length + 1);
             }
             text[name == null ? 0 : 2] += new string('─', BiggestName + BiggestValue + 1) + (name == null ? '┐' : '┤');
@@ -106,8 +106,8 @@ namespace CLI.Utilities
                 totalSize += Biggest;
                 //append to header line
                 if (!first)
-                    text[(name == null ? 0 : 2)] = text[(name == null ? 0 : 2)][0..^1] + '┬';
-                text[(name == null ? 0 : 2)] += new string('─', Biggest) + (name == null ? '┐' : '┤');
+                    text[name == null ? 0 : 2] = text[name == null ? 0 : 2][0..^1] + '┬';
+                text[name == null ? 0 : 2] += new string('─', Biggest) + (name == null ? '┐' : '┤');
                 text[name == null ? 1 : 3] += $"{keys[keyIndex]}{new string(' ', Biggest - keys[keyIndex].Length)}│";
                 //append to all otter lines
                 for (var i = 0; i < lines * 2; i += 2)

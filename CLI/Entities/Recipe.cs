@@ -12,13 +12,15 @@ namespace CLI.Entities
     {
         private const string _filePath = "C:\\Data\\Fichas_Tecnicas\\Recipes.csv";
 
-        public Recipe(string recipeName, Link[] ingredients)
+        public Recipe(string recipeName, float rendimento, Link[] ingredients)
         {
             Name = recipeName;
+            Rendimento = rendimento;
             Ingredients = ingredients;
         }
 
         public string Name { get; }
+        public float Rendimento { get; }
         public Link[] Ingredients { get; }
 
         #region Creating
@@ -26,7 +28,7 @@ namespace CLI.Entities
         internal static void Create(string[] args, ref List<string> errors, out IEnumerable<string> Data)
         {
             Data = null;
-            var newRecipe = Construct(args);
+            var newRecipe = Construct(args, ref errors);
             if (errors.Any())
                 return;
 
@@ -38,7 +40,7 @@ namespace CLI.Entities
                 return;
             }
             var id = processedData.OrderByDescending(recipe => recipe.id).FirstOrDefault().id;
-            Write(processedData.Append(new RecipeStruct(id + 1, newRecipe.Name, newRecipe.Ingredients))
+            Write(processedData.Append(new RecipeStruct(id + 1, newRecipe.Name, newRecipe.Rendimento, newRecipe.Ingredients))
                 .Select(recipe => recipe.ToString())
                 .ToArray());
             Data = new List<string>() { (id + 1).ToString(), newRecipe.Name, newRecipe.Ingredients.ToArrayString() };
@@ -48,6 +50,8 @@ namespace CLI.Entities
         #endregion Creating
 
         #region Reading
+
+        #region public
 
         internal static void Select(out IEnumerable<string> Data)
         {
@@ -60,27 +64,7 @@ namespace CLI.Entities
         {
             if (int.TryParse(id, out var index))
             {
-                var error = new List<string>();
-                Data = LoadData().Where(recipe => recipe.id == index).SingleOrDefault();
-                if (Processing.Process.showData)
-                    Utils.WriteValues("Dados", (Data.id, "index"), (Data.name, "name"));
-                Data.links
-                    .OrderBy(link => link.ingredientId)
-                    .Select<Link, (Link link, IngredientStruct ingredient)>(
-                        link => (link,
-                            Ingredient.SelectI(link.ingredientId, ref error, out var ingredient) ? ingredient : new IngredientStruct()))
-                    .SelectMany(link => new string[] {
-                        link.link.ingredientId.ToString(),
-                        link.ingredient.name,
-                        link.link.quantity.ToString(),
-                        (1 / link.ingredient.rendimento).ToString(),
-                        link.ingredient.rendimento.ToString(),
-                        (link.link.quantity / (1 / link.ingredient.rendimento)).ToString(),
-                        link.link.price.ToString(),
-                        (link.link.quantity / (1 / link.ingredient.rendimento) * link.link.price).ToString()
-                    })
-                    .PrettyPrint(new string[] { "index", "Nome", "Qtdd Liq.", "FC", "Rend", "Qtdd bruta", "Unitario", "Preço bruto" }, "Ingredientes");
-                errors.AddRange(error);
+                InternalSelect(index, ref errors, out Data);
             }
             else
             {
@@ -89,67 +73,55 @@ namespace CLI.Entities
             }
         }
 
-        //internal static void Select(string index, ref List<string> errors, out IEnumerable<string> Data)
-        //{
-        //    Data = null;
-        //    if (int.TryParse(index, out var Index))
-        //    {
-        //        Data = LoadData().Where(ingredient => ingredient.id == Index)
-        //                         .SelectMany(ingredient => new string[] {
-        //                                     ingredient.id.ToString(),
-        //                                     ingredient.name,
-        //                                     ingredient.rendimento.ToString(),
-        //                                     ingredient.price.ToString() });
-        //        Data.PrettyPrint(new string[] { "id", "Ingrediente", "Rendimento", "Preço" });
-        //    }
-        //    else
-        //    {
-        //        errors.Add($"Numero integral 'index' em formato invalido");
-        //    }
-        //}
+        #endregion public
 
-        //internal static void Select(string[] args, ref List<string> errors, out IEnumerable<string> Data)
-        //{
-        //    Data = null;
-        //    var data = LoadData();
-        //    IEnumerable<IngredientStruct> sorted = null;
-        //    switch (args[0])
-        //    {
-        //        case "nome":
-        //        case "name":
-        //            sorted = data.Where(ingredient => ingredient.name == args[1]);
-        //            break;
-        //        case "rendimento":
-        //            if (float.TryParse(args[1].Replace('.', ','), out var rend))
-        //                sorted = data.Where(ingredient => ingredient.rendimento == rend);
-        //            else
-        //                errors.Add("Numero 'Rendimento' em formato invalido");
-        //            break;
-        //        case "preço":
-        //        case "price":
-        //            if (float.TryParse(args[1].Replace('.', ','), out var price))
-        //                sorted = data.Where(ingredient => ingredient.price == price);
-        //            else
-        //                errors.Add("Numero 'Preço' em formato invalido");
-        //            break;
-        //        default:
-        //            errors.Add($"Campo '{args[0]}' desconhecido");
-        //            break;
-        //    }
-        //    if (errors.Any())
-        //        return;
-        //    if (sorted == null)
-        //    {
-        //        errors.Add("Erro interno reporte erro 1404");
-        //        return;
-        //    }
-        //    Data = sorted.SelectMany(ingredient => new string[] {
-        //                ingredient.id.ToString(),
-        //                ingredient.name,
-        //                ingredient.rendimento.ToString(),
-        //                ingredient.price.ToString() });
-        //    Data.PrettyPrint(new string[] { "id", "Ingrediente", "Rendimento", "Preço" });
-        //}
+        #region internal
+
+        internal static void InternalSelect(int index, ref List<string> errors, out RecipeStruct Data)
+        {
+            var data = LoadData().Where(recipe => recipe.id == index);
+            if (!data.Any())
+            {
+                errors.Add($"Receita de index {index} não existe");
+                Data = new RecipeStruct();
+                return;
+            }
+            Data = data.SingleOrDefault();
+            var error = new List<string>();
+            var nData = Data.links
+                .OrderBy(link => link.ingredientId)
+                .Select<Link, (Link link, IngredientStruct ingredient)>(
+                    link => (link,
+                        Ingredient.SelectI(link.ingredientId, ref error, out var ingredient) ? ingredient : new IngredientStruct()));
+            if (Processing.Process.showData)
+            {
+                float total = nData.Select((link) => link.link.quantity / (1 / link.ingredient.rendimento) * link.ingredient.price)
+                                   .Aggregate(0, (float last, float val) => val + last, val => val);
+                Utils.WriteValues("Dados",
+                                  (Data.id, "index"),
+                                  (Data.name, "name"),
+                                  (Data.rendimento, "rendimento"),
+                                  (total, "Preço total"),
+                                  (MathF.Floor(Data.rendimento / .25f * 100) / 100, "Porções de 250g"),
+                                  (MathF.Floor(total / (MathF.Floor(Data.rendimento / .25f * 100) / 100) * 100) / 100, "Preço/Porção 250g"),
+                                  (MathF.Floor(Data.rendimento / .55f * 100) / 100, "Porções de 550g"),
+                                  (MathF.Floor(total / (MathF.Floor(Data.rendimento / .55f * 100) / 100) * 100) / 100, "Preço/Porção 550g"));
+            }
+
+            nData.SelectMany(link => new string[] {
+                        link.link.ingredientId.ToString(),
+                        link.ingredient.name,
+                        (MathF.Floor(link.link.quantity*100)/100).ToString(),
+                        (MathF.Floor(1 / link.ingredient.rendimento*100)/100).ToString(),
+                        link.ingredient.rendimento.ToString(),
+                        (MathF.Floor(link.link.quantity / (1 / link.ingredient.rendimento)*100)/100).ToString(),
+                        (MathF.Floor(link.ingredient.price * 100)/100).ToString(),
+                        (MathF.Floor(link.link.quantity / (1 / link.ingredient.rendimento) * link.ingredient.price*100)/100).ToString()
+                    })
+                .PrettyPrint(new string[] { "index", "Nome", "Qtdd Liq.", "FC", "Rend", "Qtdd bruta", "Unitario", "Preço bruto" }, "Ingredientes");
+        }
+
+        #endregion internal
 
         #endregion Reading
 
@@ -158,7 +130,7 @@ namespace CLI.Entities
         internal static void Update(string[] args, ref List<string> errors, out RecipeStruct Data)
         {
             Data = new RecipeStruct();
-            var newRecipe = Construct(args.Skip(1).ToArray());
+            var newRecipe = Construct(args.Skip(1).ToArray(), ref errors);
             if (errors.Any())
                 return;
 
@@ -174,29 +146,9 @@ namespace CLI.Entities
                 processedData.Select(
                     recipe => recipe.id != id
                         ? recipe.ToString()
-                        : new RecipeStruct(recipe.id, args[1], recipe.links).ToString())
+                        : new RecipeStruct(recipe.id, args[1], newRecipe.Rendimento, recipe.links).ToString())
                 .ToArray());
-            Data = LoadData().Where(recipe => recipe.id == id).Single();
-            var error = new List<string>();
-            if (Processing.Process.showData)
-                Utils.WriteValues("New Recipe", (Data.id, "index"), (Data.name, "name"));
-            Data.links
-                .OrderBy(link => link.ingredientId)
-                .Select<Link, (Link link, IngredientStruct ingredient)>(
-                    link => (link,
-                        Ingredient.SelectI(link.ingredientId, ref error, out var ingredient) ? ingredient : new IngredientStruct()))
-                .SelectMany(link => new string[] {
-                        link.link.ingredientId.ToString(),
-                        link.ingredient.name,
-                        link.link.quantity.ToString(),
-                        (1 / link.ingredient.rendimento).ToString(),
-                        link.ingredient.rendimento.ToString(),
-                        (link.link.quantity / (1 / link.ingredient.rendimento)).ToString(),
-                        link.link.price.ToString(),
-                        (link.link.quantity / (1 / link.ingredient.rendimento) * link.link.price).ToString()
-                })
-                .PrettyPrint(new string[] { "index", "Nome", "Qtdd Liq.", "FC", "Rend", "Qtdd bruta", "Unitario", "Preço bruto" }, "Links");
-            errors.AddRange(error);
+            InternalSelect(id, ref errors, out Data);
         }
 
         #endregion Updating
@@ -218,45 +170,6 @@ namespace CLI.Entities
                 errors.Add("Numero integral 'index' em formato invalido");
             }
         }
-        /* TODO
-                internal static void Delete(string[] args, ref List<string> errors)
-                {
-                    var data = LoadData();
-                    IEnumerable<IngredientStruct> sorted = null;
-                    switch (args[0])
-                    {
-                        case "nome":
-                        case "name":
-                            sorted = data.Where(ingredient => ingredient.name != args[1]);
-                            break;
-                        case "rendimento":
-                            if (float.TryParse(args[1].Replace('.', ','), out var rend))
-                                sorted = data.Where(ingredient => ingredient.rendimento != rend);
-                            else
-                                errors.Add("Numero 'Rendimento' em formato invalido");
-                            break;
-                        case "preço":
-                        case "price":
-                            if (float.TryParse(args[1].Replace('.', ','), out var price))
-                                sorted = data.Where(ingredient => ingredient.price != price);
-                            else
-                                errors.Add("Numero 'Preço' em formato invalido");
-                            break;
-                        default:
-                            errors.Add($"Campo '{args[0]}' desconhecido");
-                            break;
-                    }
-                    if (errors.Any())
-                        return;
-                    if (sorted == null)
-                    {
-                        errors.Add("Erro interno reporte erro 3404");
-                        return;
-                    }
-                    Write(sorted.Select(ingredient => ingredient.ToString()).ToArray());
-                }
-
-        */
 
         #endregion Deleting
 
@@ -270,7 +183,7 @@ namespace CLI.Entities
             var link = Link(args[1..^0], ref errors);
             var processedData = LoadData();
             Write(processedData.Select(recipe => recipe.id == id
-                    ? new RecipeStruct(id, recipe.name, recipe.links.Append(link).ToArray()).ToString()
+                    ? new RecipeStruct(id, recipe.name, recipe.rendimento, recipe.links.Append(link).ToArray()).ToString()
                     : recipe.ToString()).ToArray());
             if (errors.Any())
                 return;
@@ -285,13 +198,13 @@ namespace CLI.Entities
                 return;
             }
             var processedData = LoadData();
-            if (!processedData.Any(recipe => recipe.id != recId ? false : recipe.links.Any(link => link.ingredientId == ingId)))
+            if (!processedData.Any(recipe => recipe.id == recId && recipe.links.Any(link => link.ingredientId == ingId)))
             {
                 errors.Add($"Link do ingredient {recId} e ingrediente {ingId} não existe");
                 return;
             }
             Write(LoadData().Select(recipe => recipe.id == recId
-                    ? new RecipeStruct(recId, recipe.name, recipe.links.Where(link => link.ingredientId != ingId).ToArray()).ToString()
+                    ? new RecipeStruct(recId, recipe.name, recipe.rendimento, recipe.links.Where(link => link.ingredientId != ingId).ToArray()).ToString()
                     : recipe.ToString()).ToArray());
             Select(args[0], ref errors, out var _);
         }
@@ -300,7 +213,15 @@ namespace CLI.Entities
 
         #region Utilities
 
-        private static Recipe Construct(string[] args) => new Recipe(args.Single(), null);
+        private static Recipe Construct(string[] args, ref List<string> errors)
+        {
+            if (!float.TryParse(args[1].Replace('.', ','), out var rendimento))
+            {
+                errors.Add("Numero rendimento em formato invalido");
+                return null;
+            }
+            return new Recipe(args[0], rendimento, null);
+        }
 
         private static Link Link(string[] args, ref List<string> errors)
         {
@@ -308,9 +229,7 @@ namespace CLI.Entities
                 errors.Add($"Index em fomato invalido {args[0]}");
             if (!float.TryParse(args[1].Replace('.', ','), out var quantity))
                 errors.Add($"Quantidade em fomato invalido {args[1]}");
-            if (!float.TryParse(args[2].Replace('.', ','), out var price))
-                errors.Add($"Preço em fomato invalido {args[2]}");
-            return (id, quantity, price);
+            return new Link(id, quantity);
         }
 
         private static void Write(string[] vals) => File.WriteAllLines(_filePath, vals);
@@ -322,7 +241,7 @@ namespace CLI.Entities
 
             return File.ReadAllLines(_filePath)
                        .Select(line => line.Split(','))
-                       .Select((vals) => new RecipeStruct(int.Parse(vals[0]), vals[1], Parse(vals[2])))
+                       .Select((vals) => new RecipeStruct(int.Parse(vals[0]), vals[1], float.Parse(vals[2]), Parse(vals[3])))
                        .ToArray();
         }
 
@@ -331,7 +250,7 @@ namespace CLI.Entities
             List<Link> result = new List<Link>();
             for (var pos = 0; pos < vals.Length; pos++)
             {
-                Link current = (0, 0, 0);
+                Link current = (0, 0);
                 switch (vals[pos])
                 {
                     case '\0':
@@ -343,16 +262,11 @@ namespace CLI.Entities
                         continue;
                     default:
                         string changing = "";
-                        int last = 0;
                         while (vals[pos] != '}')
                         {
                             if (vals[pos] == ':')
                             {
-                                current = (
-                                    last == 0 ? int.Parse(changing) : current.ingredientId,
-                                    last == 1 ? float.Parse(changing.Replace('.', ',')) : current.quantity,
-                                    0);
-                                last++;
+                                current = (int.Parse(changing), 0);
                                 changing = "";
                             }
                             else
@@ -361,7 +275,7 @@ namespace CLI.Entities
                             }
                             pos++;
                         }
-                        current = (current.ingredientId, current.quantity, float.Parse(changing.Replace('.', ',')));
+                        current = (current.ingredientId, float.Parse(changing.Replace('.', ',')));
                         result.Add(current);
                         continue;
                 }
