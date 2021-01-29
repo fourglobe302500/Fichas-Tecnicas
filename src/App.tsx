@@ -20,7 +20,7 @@ function App() {
       <Content>
         <Link
           style={{ textDecoration: "none", color: "cyan" }}
-          href="/Fichas-Tecnicas/App.zip"
+          href="/Fichas-Tecnicas/CLI.zip"
         >
           Click Here To Download
         </Link>
